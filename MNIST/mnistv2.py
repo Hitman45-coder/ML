@@ -45,3 +45,4 @@ num = y_pred[34]
 print(num)
 # %%
 plot_num(X_test[34])
+
