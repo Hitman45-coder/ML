@@ -13,11 +13,14 @@ def plot_num(some_digit):
     image = some_digit.reshape(28,28)
     plt.imshow(image, cmap= "binary")
 
-image = X[0]
+image = X[9]
 plot_num(image)
 plt.show()
 
 
+
+# %%
+print(y[9])
 # %%
 X_train, X_test, y_train, y_test = X[:60000], X[60000:], y[:60000], y[60000:]
 X_train_normalized =  X_train / 255
