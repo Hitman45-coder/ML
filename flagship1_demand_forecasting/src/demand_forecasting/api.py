@@ -31,10 +31,10 @@ class ForecastRequest(BaseModel):
     holiday: int = Field(ge=0, le=1)
     workingday: int = Field(ge=0, le=1)
     weathersit: int = Field(ge=1, le=4)
-    temperature_c: float = Field(ge=0, le=41, description="Outdoor temperature in °C")
-    feels_like_c: float = Field(ge=0, le=50, description="Feels-like temperature in °C")
+    temperature_c: float = Field(ge=0, le=50, description="Outdoor temperature in °C")
+    feels_like_c: float = Field(ge=0, le=55, description="Feels-like temperature in °C")
     humidity_percent: float = Field(ge=0, le=100, description="Relative humidity in percent")
-    windspeed_kmh: float = Field(ge=0, le=67, description="Wind speed in km/h")
+    windspeed_kmh: float = Field(ge=0, le=90, description="Wind speed in km/h")
 
 
 class ForecastResponse(BaseModel):

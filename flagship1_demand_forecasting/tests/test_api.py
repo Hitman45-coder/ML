@@ -1,5 +1,6 @@
 import importlib
 
+import pytest
 from fastapi.testclient import TestClient
 
 from demand_forecasting.data import FEATURES, build_features
@@ -120,9 +121,24 @@ def test_forecast_accepts_human_weather_units(monkeypatch, tmp_path):
         "/v1/forecast",
         json={
             "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
-            "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
-            "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 33.5,
+            "workingday": 1, "weathersit": 1, "temperature_c": 50.0,
+            "feels_like_c": 55.0, "humidity_percent": 50.0, "windspeed_kmh": 90.0,
         },
     )
     assert response.status_code == 200
     assert response.json()["model_version"] == "units"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [("temperature_c", 50.1), ("feels_like_c", 55.1), ("windspeed_kmh", 90.1)],
+)
+def test_forecast_rejects_expanded_weather_bounds(field, value):
+    module = importlib.import_module("demand_forecasting.api")
+    payload = {
+        "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
+        "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+        "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 13.4,
+    }
+    payload[field] = value
+    assert TestClient(module.app).post("/v1/forecast", json=payload).status_code == 422
