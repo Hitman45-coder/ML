@@ -19,19 +19,19 @@
 
     <section class="grid">
       <form id="forecast-form" class="card form-card">
-        <div class="card-heading"><div><p class="eyebrow">INPUTS</p><h2>Forecast a time slot</h2></div><span class="hint">Values follow the UCI dataset scale</span></div>
+        <div class="card-heading"><div><p class="eyebrow">INPUTS</p><h2>Forecast a time slot</h2></div><span class="hint">Enter normal weather units</span></div>
         <label>Timestamp <input name="timestamp" type="datetime-local" value="2012-06-01T10:00" required></label>
         <div class="two-col">
           <label>Season <select name="season"><option value="1">Winter</option><option value="2" selected>Spring</option><option value="3">Summer</option><option value="4">Fall</option></select></label>
           <label>Weather <select name="weathersit"><option value="1">Clear / partly cloudy</option><option value="2">Mist / cloudy</option><option value="3">Light rain / snow</option><option value="4">Heavy rain / snow</option></select></label>
         </div>
         <div class="two-col">
-          <label>Temperature <input name="temp" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
-          <label>Feels-like temp <input name="atemp" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
+          <label>Temperature (°C) <input name="temperature_c" type="number" min="0" max="41" step="0.1" value="22.0" required><small>0–41 °C</small></label>
+          <label>Feels-like temp (°C) <input name="feels_like_c" type="number" min="0" max="50" step="0.1" value="22.0" required><small>0–50 °C</small></label>
         </div>
         <div class="two-col">
-          <label>Humidity <input name="hum" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
-          <label>Wind speed <input name="windspeed" type="number" min="0" max="1" step="0.01" value="0.20" required><small>Normalized 0–1</small></label>
+          <label>Humidity (%) <input name="humidity_percent" type="number" min="0" max="100" step="1" value="50" required><small>Relative humidity 0–100%</small></label>
+          <label>Wind speed (km/h) <input name="windspeed_kmh" type="number" min="0" max="67" step="0.1" value="15.0" required><small>0–67 km/h</small></label>
         </div>
         <div class="two-col checks">
           <label class="check"><input name="workingday" type="checkbox" checked> Working day</label>
@@ -56,6 +56,6 @@
     <section class="card metrics-card"><div class="card-heading"><div><p class="eyebrow">MODEL CARD SNAPSHOT</p><h2>Held-out performance</h2></div><a href="/docs" target="_blank" rel="noreferrer">API documentation ↗</a></div><div id="metrics-grid" class="metrics-grid"><div class="metric"><span>Loading report…</span></div></div></section>
     <footer><span>Production-style demo · chronological evaluation · no post-outcome features</span><a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noreferrer">Dataset source ↗</a></footer>
   </main>
-  <script src="/assets/app.js"></script>
+  <script src="/assets/app.js?v=20260908"></script>
 </body>
 </html>

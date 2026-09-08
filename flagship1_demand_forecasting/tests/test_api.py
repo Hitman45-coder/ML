@@ -23,8 +23,8 @@ def test_forecast_fails_safely_without_model(monkeypatch, tmp_path):
         "/v1/forecast",
         json={
             "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
-            "workingday": 1, "weathersit": 1, "temp": 0.5, "atemp": 0.5,
-            "hum": 0.5, "windspeed": 0.2,
+            "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+            "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 13.4,
         },
     )
     assert response.status_code == 503
@@ -71,8 +71,8 @@ def test_forecast_contract(monkeypatch, tmp_path):
     module._bundle = None
     response = TestClient(module.app).post("/v1/forecast", json={
         "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
-        "workingday": 1, "weathersit": 1, "temp": 0.5, "atemp": 0.5,
-        "hum": 0.5, "windspeed": 0.2,
+        "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+        "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 13.4,
     })
     assert response.status_code == 200
     assert response.json()["model_version"] == "test"
@@ -80,8 +80,8 @@ def test_forecast_contract(monkeypatch, tmp_path):
         "/v1/forecast",
         json={
             "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
-            "workingday": 1, "weathersit": 1, "temp": 0.5, "atemp": 0.5,
-            "hum": 0.5, "windspeed": 0.2,
+            "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+            "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 13.4,
         },
     )
     assert second.json()["forecast_demand"] == response.json()["forecast_demand"]
@@ -93,8 +93,36 @@ def test_forecast_rejects_invalid_humidity():
         "/v1/forecast",
         json={
             "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
-            "workingday": 1, "weathersit": 1, "temp": 0.5, "atemp": 0.5,
-            "hum": 2, "windspeed": 0.2,
+            "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+            "feels_like_c": 25.0, "humidity_percent": 101.0, "windspeed_kmh": 13.4,
         },
     )
     assert response.status_code == 422
+
+
+def test_forecast_accepts_human_weather_units(monkeypatch, tmp_path):
+    x, y = build_features(sample_frame(30))
+    model = build_model().fit(x, y)
+    path = tmp_path / "model.joblib"
+    save_bundle(
+        {
+            "model": model,
+            "features": FEATURES,
+            "model_version": "units",
+            "residual_quantile_90": 5.0,
+        },
+        path,
+    )
+    module = importlib.import_module("demand_forecasting.api")
+    monkeypatch.setattr(module, "MODEL_PATH", path)
+    module._bundle = None
+    response = TestClient(module.app).post(
+        "/v1/forecast",
+        json={
+            "timestamp": "2012-06-01T10:00:00", "season": 2, "holiday": 0,
+            "workingday": 1, "weathersit": 1, "temperature_c": 20.5,
+            "feels_like_c": 25.0, "humidity_percent": 50.0, "windspeed_kmh": 33.5,
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["model_version"] == "units"

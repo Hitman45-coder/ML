@@ -19,6 +19,25 @@ FEATURES = [
     "temp", "atemp", "hum", "windspeed", "hour", "day_of_year",
 ]
 DATA_URL = "https://archive.ics.uci.edu/static/public/275/bike+sharing+dataset.zip"
+TEMPERATURE_SCALE_C = 41.0
+FEELS_LIKE_SCALE_C = 50.0
+HUMIDITY_SCALE_PERCENT = 100.0
+WINDSPEED_SCALE_KMH = 67.0
+
+
+def normalize_weather_inputs(
+    temperature_c: float,
+    feels_like_c: float,
+    humidity_percent: float,
+    windspeed_kmh: float,
+) -> dict[str, float]:
+    """Convert human weather units into the UCI model's normalized features."""
+    return {
+        "temp": temperature_c / TEMPERATURE_SCALE_C,
+        "atemp": feels_like_c / FEELS_LIKE_SCALE_C,
+        "hum": humidity_percent / HUMIDITY_SCALE_PERCENT,
+        "windspeed": windspeed_kmh / WINDSPEED_SCALE_KMH,
+    }
 
 
 def download_dataset(path: Path, url: str = DATA_URL) -> Path:

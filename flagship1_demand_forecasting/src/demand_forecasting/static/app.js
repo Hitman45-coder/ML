@@ -39,12 +39,19 @@ form.addEventListener('submit', async (event) => {
     // Keep the hour selected by the operator. The API treats this historical dataset timestamp as local/naive;
     // converting it to UTC would shift the hour for users outside UTC.
     timestamp: `${values.timestamp}:00`, season: Number(values.season), weathersit: Number(values.weathersit),
-    temp: Number(values.temp), atemp: Number(values.atemp), hum: Number(values.hum), windspeed: Number(values.windspeed),
+    temperature_c: Number(values.temperature_c), feels_like_c: Number(values.feels_like_c),
+    humidity_percent: Number(values.humidity_percent), windspeed_kmh: Number(values.windspeed_kmh),
     workingday: form.workingday.checked ? 1 : 0, holiday: form.holiday.checked ? 1 : 0,
   };
   try {
     const response = await fetch('/v1/forecast', { method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(body) });
-    const payload = await response.json(); if (!response.ok) throw new Error(payload.detail || 'Forecast request failed');
+    const payload = await response.json();
+    if (!response.ok) {
+      const detail = Array.isArray(payload.detail)
+        ? payload.detail.map((item) => item.msg).join('; ')
+        : payload.detail;
+      throw new Error(detail || 'Forecast request failed');
+    }
     document.querySelector('#result-empty').classList.add('hidden'); document.querySelector('#result-content').classList.remove('hidden');
     document.querySelector('#forecast-value').textContent = Math.round(payload.forecast_demand).toLocaleString();
     const rec = document.querySelector('#recommendation'); rec.textContent = payload.recommendation; rec.className = `recommendation ${payload.recommendation}`;

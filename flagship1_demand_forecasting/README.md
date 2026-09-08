@@ -25,7 +25,7 @@ Then open `/` for the browser dashboard, `/docs` for interactive API documentati
 ```bash
 curl -X POST http://localhost:8000/v1/forecast \
   -H 'content-type: application/json' \
-  -d '{"timestamp":"2012-06-01T10:00:00","season":2,"holiday":0,"workingday":1,"weathersit":1,"temp":0.5,"atemp":0.5,"hum":0.5,"windspeed":0.2}'
+  -d '{"timestamp":"2012-06-01T10:00:00","season":2,"holiday":0,"workingday":1,"weathersit":1,"temperature_c":22.0,"feels_like_c":22.0,"humidity_percent":50,"windspeed_kmh":15.0}'
 ```
 
 The training command creates ignored local files in `artifacts/`: `model.joblib`, `metrics.json`, and `metadata.json`. The split is 70% train, 15% validation, and 15% final test in time order. `casual`, `registered`, and `cnt` never enter the feature matrix.
@@ -47,7 +47,7 @@ The image defaults to the non-root `appuser`. On restricted rootless environment
 
 `GET /` serves the browser dashboard. It calls the same-origin API and shows the forecast, planning interval, recommendation, model version, latency, and held-out metrics. `/docs` remains available as the interactive OpenAPI console.
 
-`POST /v1/forecast` accepts timestamp, weather, and calendar inputs. It returns a non-negative demand forecast, a documented planning band from the 90th percentile validation residual, a coarse `NORMAL`/`PREPARE`/`SURGE` recommendation, model version, and request latency. Set `PREPARE_THRESHOLD` and `SURGE_THRESHOLD` environment variables to tune the operational cutoffs. `/health` reports a degraded state until a model artifact exists.
+`POST /v1/forecast` accepts timestamp, weather, and calendar inputs. Weather values use ordinary operator units: `temperature_c` (0–41 °C), `feels_like_c` (0–50 °C), `humidity_percent` (0–100%), and `windspeed_kmh` (0–67 km/h). The API converts them to the UCI model’s normalized features internally (`temp = °C / 41`, `atemp = °C / 50`, `hum = % / 100`, `windspeed = km/h / 67`). It returns a non-negative demand forecast, a documented planning band from the 90th percentile validation residual, a coarse `NORMAL`/`PREPARE`/`SURGE` recommendation, model version, and request latency. Set `PREPARE_THRESHOLD` and `SURGE_THRESHOLD` environment variables to tune the operational cutoffs. `/health` reports a degraded state until a model artifact exists.
 
 ## Engineering decisions
 

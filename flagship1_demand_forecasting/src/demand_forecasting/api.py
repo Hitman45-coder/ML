@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .data import FEATURES
+from .data import FEATURES, normalize_weather_inputs
 from .model import load_bundle
 
 app = FastAPI(title="Demand Forecasting Decision API", version="0.1.0")
@@ -31,10 +31,10 @@ class ForecastRequest(BaseModel):
     holiday: int = Field(ge=0, le=1)
     workingday: int = Field(ge=0, le=1)
     weathersit: int = Field(ge=1, le=4)
-    temp: float = Field(ge=0, le=1)
-    atemp: float = Field(ge=0, le=1)
-    hum: float = Field(ge=0, le=1)
-    windspeed: float = Field(ge=0, le=1)
+    temperature_c: float = Field(ge=0, le=41, description="Outdoor temperature in °C")
+    feels_like_c: float = Field(ge=0, le=50, description="Feels-like temperature in °C")
+    humidity_percent: float = Field(ge=0, le=100, description="Relative humidity in percent")
+    windspeed_kmh: float = Field(ge=0, le=67, description="Wind speed in km/h")
 
 
 class ForecastResponse(BaseModel):
@@ -93,11 +93,16 @@ def forecast(request: ForecastRequest) -> ForecastResponse:
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     ts = request.timestamp
+    weather = normalize_weather_inputs(
+        temperature_c=request.temperature_c,
+        feels_like_c=request.feels_like_c,
+        humidity_percent=request.humidity_percent,
+        windspeed_kmh=request.windspeed_kmh,
+    )
     row = {
         "season": request.season, "yr": int(ts.year >= 2012), "mnth": ts.month,
         "holiday": request.holiday, "weekday": ts.weekday(), "workingday": request.workingday,
-        "weathersit": request.weathersit, "temp": request.temp, "atemp": request.atemp,
-        "hum": request.hum, "windspeed": request.windspeed, "hour": ts.hour,
+        "weathersit": request.weathersit, **weather, "hour": ts.hour,
         "day_of_year": ts.timetuple().tm_yday,
     }
     prediction = max(0.0, float(bundle["model"].predict(pd.DataFrame([row], columns=FEATURES))[0]))

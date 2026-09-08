@@ -1,7 +1,13 @@
 import pandas as pd
 import pytest
 
-from demand_forecasting.data import FEATURES, build_features, chronological_split, download_dataset
+from demand_forecasting.data import (
+    FEATURES,
+    build_features,
+    chronological_split,
+    download_dataset,
+    normalize_weather_inputs,
+)
 
 
 def sample_frame(n=20):
@@ -36,3 +42,18 @@ def test_download_dataset_skips_existing_file(tmp_path):
     target.write_text("already downloaded", encoding="utf-8")
     assert download_dataset(target) == target
     assert target.read_text(encoding="utf-8") == "already downloaded"
+
+
+def test_normalize_weather_inputs_uses_human_units():
+    normalized = normalize_weather_inputs(
+        temperature_c=20.5,
+        feels_like_c=25.0,
+        humidity_percent=50.0,
+        windspeed_kmh=33.5,
+    )
+    assert normalized == {
+        "temp": 0.5,
+        "atemp": 0.5,
+        "hum": 0.5,
+        "windspeed": 0.5,
+    }
