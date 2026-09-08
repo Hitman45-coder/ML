@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demand Forecasting Console</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">FLAGSHIP 01 · ML DECISION SERVICE</p>
+        <h1>Demand Forecasting Console</h1>
+        <p class="lede">Estimate hourly bike demand and turn the forecast into a planning signal for operations teams.</p>
+      </div>
+      <div id="health-pill" class="pill pill-loading">Checking model…</div>
+    </header>
+
+    <section class="grid">
+      <form id="forecast-form" class="card form-card">
+        <div class="card-heading"><div><p class="eyebrow">INPUTS</p><h2>Forecast a time slot</h2></div><span class="hint">Values follow the UCI dataset scale</span></div>
+        <label>Timestamp <input name="timestamp" type="datetime-local" value="2012-06-01T10:00" required></label>
+        <div class="two-col">
+          <label>Season <select name="season"><option value="1">Winter</option><option value="2" selected>Spring</option><option value="3">Summer</option><option value="4">Fall</option></select></label>
+          <label>Weather <select name="weathersit"><option value="1">Clear / partly cloudy</option><option value="2">Mist / cloudy</option><option value="3">Light rain / snow</option><option value="4">Heavy rain / snow</option></select></label>
+        </div>
+        <div class="two-col">
+          <label>Temperature <input name="temp" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
+          <label>Feels-like temp <input name="atemp" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
+        </div>
+        <div class="two-col">
+          <label>Humidity <input name="hum" type="number" min="0" max="1" step="0.01" value="0.50" required><small>Normalized 0–1</small></label>
+          <label>Wind speed <input name="windspeed" type="number" min="0" max="1" step="0.01" value="0.20" required><small>Normalized 0–1</small></label>
+        </div>
+        <div class="two-col checks">
+          <label class="check"><input name="workingday" type="checkbox" checked> Working day</label>
+          <label class="check"><input name="holiday" type="checkbox"> Holiday</label>
+        </div>
+        <button id="submit-button" type="submit">Generate forecast <span>→</span></button>
+        <p id="form-error" class="error" role="alert"></p>
+      </form>
+
+      <section class="card result-card" aria-live="polite">
+        <div class="card-heading"><div><p class="eyebrow">DECISION OUTPUT</p><h2>Operational view</h2></div><span id="result-time" class="hint">Awaiting input</span></div>
+        <div id="result-empty" class="empty"><div class="empty-icon">⌁</div><p>Submit the conditions for a forecast.</p><small>The response includes an uncertainty band and a planning recommendation.</small></div>
+        <div id="result-content" class="hidden">
+          <div class="forecast-number"><span id="forecast-value">—</span><small>bikes / hour</small></div>
+          <div id="recommendation" class="recommendation">—</div>
+          <div class="band"><div class="band-label"><span>Planning range</span><strong id="band-value">—</strong></div><div class="band-track"><span id="band-fill"></span></div></div>
+          <dl class="metadata"><div><dt>Model</dt><dd id="model-version">—</dd></div><div><dt>Response time</dt><dd id="latency">—</dd></div><div><dt>Evaluation</dt><dd id="test-mae">—</dd></div></dl>
+        </div>
+      </section>
+    </section>
+
+    <section class="card metrics-card"><div class="card-heading"><div><p class="eyebrow">MODEL CARD SNAPSHOT</p><h2>Held-out performance</h2></div><a href="/docs" target="_blank" rel="noreferrer">API documentation ↗</a></div><div id="metrics-grid" class="metrics-grid"><div class="metric"><span>Loading report…</span></div></div></section>
+    <footer><span>Production-style demo · chronological evaluation · no post-outcome features</span><a href="https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset" target="_blank" rel="noreferrer">Dataset source ↗</a></footer>
+  </main>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
